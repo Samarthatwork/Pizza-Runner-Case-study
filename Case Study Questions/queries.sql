@@ -28,17 +28,18 @@ GROUP BY c.customer_id;
 
 -- What was the maximum number of pizzas delivered in a single order?
 SELECT MAX(a.CP)AS Max_Pizza_Delivered
-FROM 
-	(SELECT order_id, 
+FROM    (SELECT order_id, 
 	COUNT(pizza_id) OVER(PARTITION BY order_id)AS CP 
 	FROM customer_orders)a;
 
 
 -- For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 SELECT c.customer_id, 
-SUM(CASE WHEN (exclusions IS NOT NULL AND exclusions != 0) OR (extras IS NOT NULL AND extras != 0) THEN 1
+SUM(CASE WHEN (exclusions IS NOT NULL AND exclusions != 0) 
+    OR (extras IS NOT NULL AND extras != 0) THEN 1
         ELSE 0 END )AS At_least_One_Change,
-SUM(CASE WHEN (exclusions IS NULL OR exclusions = 0) AND (extras IS NULL OR extras = 0) THEN 1
+SUM(CASE WHEN (exclusions IS NULL OR exclusions = 0) 
+    AND (extras IS NULL OR extras = 0) THEN 1
         ELSE 0 END ) AS No_Change
 FROM customer_orders c
 JOIN runner_orders r
@@ -152,6 +153,30 @@ ORDER BY runner_id;
 
 -- C. Ingredient Optimisation
 -- What are the standard ingredients for each pizza?
+-- Normalize Pizza Recipe table
+drop table if exists pizza_recipes1;
+create table pizzarunner.pizza_recipes1 
+(
+ pizza_id int,
+    toppings int);
+insert into pizzarunner.pizza_recipes1
+(pizza_id, toppings) 
+values
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(1,5),
+(1,6),
+(1,8),
+(1,10),
+(2,4),
+(2,6),
+(2,7),
+(2,9),
+(2,11),
+(2,12);
+
 with cte as (
 select p3.pizza_name,p1.pizza_id, p2.topping_name
 from pizza_runner.pizza_recipes p1
@@ -165,13 +190,52 @@ from cte
 group by pizza_name;
 
 -- What was the most commonly added extra?
-
-
-
+drop table if exists numbers;
+CREATE TABLE numbers (
+  num INT PRIMARY KEY
+);
+INSERT INTO numbers VALUES
+( 1 ), ( 2 ), ( 3 ), ( 4 ), ( 5 ), ( 6 ), ( 7 ), ( 8 ), ( 9 ), ( 10 ),( 11 ), ( 12 ), ( 13 ), ( 14 );
+with cte as (SELECT n.num, SUBSTRING_INDEX(SUBSTRING_INDEX(all_tags, ',', num), ',', -1) as one_tag
+FROM (
+  SELECT
+    GROUP_CONCAT(extras SEPARATOR ',') AS all_tags,
+    LENGTH(GROUP_CONCAT(extras SEPARATOR ',')) - LENGTH(REPLACE(GROUP_CONCAT(extras SEPARATOR ','), ',', '')) + 1 AS count_tags
+  FROM pizzarunner.customer_orders1
+) t
+JOIN numbers n
+ON n.num <= t.count_tags)
+select one_tag as Extras,pizza_toppings.topping_name as ExtraTopping, count(one_tag) as Occurrencecount
+from cte
+inner join pizzarunner.pizza_toppings
+on pizza_toppings.topping_id = cte.one_tag
+where one_tag != 0
+group by one_tag;
 
 
 -- What was the most common exclusion?
-
+drop table if exists numbers;
+CREATE TABLE numbers (
+  num INT PRIMARY KEY
+);
+INSERT INTO numbers VALUES
+    ( 1 ), ( 2 ), ( 3 ), ( 4 ), ( 5 ), ( 6 ), ( 7 ), ( 8 ), ( 9 ), ( 10 ),( 11 ), ( 12 ), ( 13 ), ( 14 );
+with cte as (SELECT n.num, SUBSTRING_INDEX(SUBSTRING_INDEX(all_tags, ',', num), ',', -1) as one_tag
+FROM (
+  SELECT
+    GROUP_CONCAT(exclusions SEPARATOR ',') AS all_tags,
+    LENGTH(GROUP_CONCAT(exclusions SEPARATOR ',')) - LENGTH(REPLACE(GROUP_CONCAT(exclusions SEPARATOR ','), ',', '')) + 1 AS count_tags
+  FROM pizzarunner.customer_orders
+) t
+JOIN numbers n
+ON n.num <= t.count_tags)
+select one_tag as Exclusions,pizza_toppings.topping_name as ExclusionTopping, count(one_tag) as Occurrencecount
+from cte
+inner join pizzarunner.pizza_toppings
+on pizza_toppings.topping_id = cte.one_tag
+where one_tag != 0
+group by one_tag
+order by Occurrencecount desc;
 
 
 
@@ -184,14 +248,44 @@ group by pizza_name;
 -- Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients
 -- For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
 -- What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?
+select customer_orders1.order_id, customer_orders1.pizza_id, pizza_names.pizza_name, customer_orders1.exclusions, customer_orders1.extras, 
+case
+when customer_orders1.pizza_id = 1 and (exclusions is null or exclusions=0) and (extras is null or extras=0) then 'Meat Lovers'
+when customer_orders1.pizza_id = 2 and (exclusions is null or exclusions=0) and (extras is null or extras=0) then 'Veg Lovers'
+when customer_orders1.pizza_id = 2 and (exclusions =4 ) and (extras is null or extras=0) then 'Veg Lovers - Exclude Cheese'
+when customer_orders1.pizza_id = 1 and (exclusions =4 ) and (extras is null or extras=0) then 'Meat Lovers - Exclude Cheese'
+when customer_orders1.pizza_id=1 and (exclusions like '%3%' or exclusions =3) and (extras is null or extras=0) then 'Meat Lovers - Exclude Beef'
+when customer_orders1.pizza_id =1 and (exclusions is null or exclusions=0) and (extras like '%1%' or extras =1) then 'Meat Lovers - Extra Bacon'
+when customer_orders1.pizza_id=1 and (exclusions like '1, 4' ) and (extras like '6, 9') then 'Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers'
+when customer_orders1.pizza_id=1 and (exclusions like '2, 6' ) and (extras like '1, 4') then 'Meat Lovers - Exclude BBQ Sauce,Mushroom - Extra Bacon, Cheese'
+when customer_orders1.pizza_id=1 and (exclusions =4) and (extras like '1, 5') then 'Meat Lovers - Exclude Cheese - Extra Bacon, Chicken'
+end as OrderItem
+from customer_orders1
+inner join pizza_names
+on pizza_names.pizza_id = customer_orders1.pizza_id;
 
 
 -- D. Pricing and Ratings
-/* If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes 
-   how much money has Pizza Runner made so far if there are no delivery fees?*/
-   
+-- If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes 
+how much money has Pizza Runner made so far if there are no delivery fees?
+   select sum(case 
+when c.pizza_id = 1 then 12
+else 10
+end) as TotalAmount
+from runner_orders1 as r
+inner join customer_orders1 as c
+on c.order_id = r.order_id
+where r.distance is not null;
+
 -- What if there was an additional $1 charge for any pizza extras?
 -- Add cheese is $1 extra
+set @basecost = 138;
+select (LENGTH(group_concat(extras)) - LENGTH(REPLACE(group_concat(extras), ',', '')) + 1) + @basecost as Total
+from customer_orders1
+inner join runner_orders1
+on customer_orders1.order_id = runner_orders1.order_id
+where extras is not null and extras !=0 and distance is not null;
+
 /*The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, 
 how would you design an additional table for this new dataset - 
 generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.
@@ -207,6 +301,11 @@ Time between order and pickup
 Delivery duration
 Average speed
 Total number of pizzas*/
+set @pizzaamountearned = 138;
+select @pizzaamountearned - (sum(distance))*0.3 as Finalamount
+from runner_orders1;
+
 /*If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?
-E. Bonus Questions
-If Danny wants to expand his range of pizzas - how would this impact the existing data design? Write an INSERT statement to demonstrate what would happen if a new Supreme pizza with all the toppings was added to the Pizza Runner menu?*/
+set @pizzaamountearned = 138;
+select @pizzaamountearned - (sum(distance))*0.3 as Finalamount
+from runner_orders1;
