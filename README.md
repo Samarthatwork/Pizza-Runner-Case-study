@@ -32,7 +32,35 @@ The runners table shows the registration_date for each new runner
 |    4	     | |     2021-01-15    |
 
  </details>
-    
+
+# Runners Table
+
+A simple table to show the registration dates for new runners.
+
+## Table Schema
+
+The table schema for the `runners` table is as follows:
+
+| Column Name | Data Type | Description |
+| ----------- | --------- | ----------- |
+| runner_id | integer | A unique ID for each runner |
+| registration_date | date | The date that each runner registered |
+
+## Table Data
+
+The `runners` table contains the following data:
+
+| runner_id | registration_date |
+| --------- | ---------------- |
+| 1         | 2021-01-01       |
+| 2         | 2021-01-03       |
+| 3         | 2021-01-08       |
+| 4         | 2021-01-15       |
+
+## Usage
+
+The `runners` table can be used as a simple reference for tracking the registration dates of new runners.
+
  ### **2. customer_orders**
 
  <details><summary>
