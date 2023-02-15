@@ -215,6 +215,12 @@ Total number of pizzas
 5. If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?
  
  ## **:dart: INSIGHTS GENERATED**
- 1. Ramen was the most favorite dish/ ordered item by all the customers with ordered 8 times.
- 2. Customer with Id 'A' ordered the most while Customer with ID 'B' spent the least amount
- 3. Customer with Id 'B' visited more in the restaurant i.e., **6 times**.
+ 1. Most of the successful orders are delivered by Runner ID 1.
+2. Meatlovers and Vegetarian pizzas are the most popular pizzas with customers.
+3. The majority of the delivered pizzas had no changes.
+4. The maximum number of pizzas delivered in a single order was 18.
+5. The busiest hour of the day was from 7 pm to 9 pm, and the busiest day of the week was Sunday.
+6. The average time it takes for each runner to arrive at the Pizza Runner HQ to pickup the order is 36 minutes.
+7. The longest delivery time was 2 hours and 25 minutes, and the shortest delivery time was 4 minutes.
+8. There was no correlation between the number of pizzas in an order and how long it takes to prepare them.
+9. Most of the customers live within 5-6 km of the HQ., **6 times**.
