@@ -16,24 +16,8 @@ Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runn
 + Danny has provided you with a sample of his overall customer data due to privacy issues - but he hopes that these examples are enough for you to write fully functioning SQL queries to help him answer his questions!
 
  # **:file_folder: DATASETS**
- Danny has shared with you 3 key datasets for this case study:
-   ### **1. RUNNERS**
 
- <details><summary>
- View Table
- </summary>
-The runners table shows the registration_date for each new runner
-
-| runner_id	| | registration_date |
-| --------- | | ----------------- |
-|    1	     | |     2021-01-01    |
-|    2	     | |     2021-01-03    |
-|    3	     | |     2021-01-08    |
-|    4	     | |     2021-01-15    |
-
- </details>
-
-# Runners Table
+# **1. Runners Table**
 
 A simple table to show the registration dates for new runners.
 
