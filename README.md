@@ -17,7 +17,6 @@ He has provided an entity relationship diagram of his database design, but requi
 All datasets are located within the `pizza_runner` database schema. Please include this reference in your SQL scripts as you begin to explore the data and answer the case study questions.
 
 ##  Entity Relationship Diagram
-![This is an image](https://dbdiagram.io/d/5f3e085ccf48a141ff558487/?utm_source=dbdiagram_embed&utm_medium=bottom_open)
 ![image](https://user-images.githubusercontent.com/112954849/218943360-962237e1-51ad-4cbc-bbe2-f1be0ef07b68.png)
 
 
