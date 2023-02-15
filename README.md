@@ -8,12 +8,14 @@ Danny was scrolling through his Instagram feed when something really caught his 
 Danny was sold on the idea, but he knew that pizza alone was not going to help him get seed funding to expand his new Pizza Empire - so he had one more genius idea to combine with it - he was going to Uberize it - and so Pizza Runner was launched!
 
 Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runner Headquarters (otherwise known as Danny’s house) and also maxed out his credit card to pay freelance developers to build a mobile app to accept orders from customers.
-## PROBLEM STATEMENT
-- Danny wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite. Having this deeper connection with his customers will help him deliver a better and more personalised experience for his loyal customers.
 
-* He plans on using these insights to help him decide whether he should expand the existing customer loyalty program - additionally he needs help to generate some basic datasets so his team can easily inspect the data without needing to use SQL.
+## Available Data
 
-+ Danny has provided you with a sample of his overall customer data due to privacy issues - but he hopes that these examples are enough for you to write fully functioning SQL queries to help him answer his questions!
+Danny, with his experience as a data scientist, understands the critical role of data collection for the growth of his business. 
+He has provided an entity relationship diagram of his database design, but requires further assistance to clean his data and perform basic calculations to optimize the operations of Pizza Runner.
+
+All datasets are located within the `pizza_runner` database schema. Please include this reference in your SQL scripts as you begin to explore the data and answer the case study questions.
+
 
  # **:file_folder: DATASETS**
 
