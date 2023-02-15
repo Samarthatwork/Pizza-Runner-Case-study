@@ -5,19 +5,19 @@ SELECT * FROM pizza_runner.pizza_toppings;
 SELECT * FROM pizza_runner.runners;
 SELECT * FROM pizza_runner.runner_orders;
 
--- How many successful orders were delivered by each runner?
+Q1. How many successful orders were delivered by each runner?
 SELECT runner_id, COUNT(order_id)AS Successful_Orders
 FROM pizza_runner.runner_orders
 WHERE cancellation NOT IN ('Restaurant Cancellation', 'Customer Cancellation')
 GROUP BY runner_id;
 
--- How many of each type of pizza was delivered?
+Q2. How many of each type of pizza was delivered?
 SELECT p.pizza_id, p.pizza_name, COUNT(p.pizza_id)AS pizza_count
 FROM pizza_names p JOIN customer_orders c 
 ON p.pizza_id = c.pizza_id
 GROUP BY p.pizza_id;
 
--- How many Vegetarian and Meatlovers were ordered by each customer?
+Q3.How many Vegetarian and Meatlovers were ordered by each customer?
 SELECT c.customer_id,
 SUM(CASE WHEN p.pizza_name ='Meatlovers' THEN 1 ELSE 0 END)AS MEATLOVERS_PIZZA_COUNT,
 SUM(CASE WHEN p.pizza_name ='Vegetarian' THEN 1 ELSE 0 END)AS VEGETARIAN_PIZZA_COUNT
@@ -25,15 +25,13 @@ FROM customer_orders c JOIN pizza_names p
 ON c.pizza_id = p.pizza_id
 GROUP BY c.customer_id;
 
-
--- What was the maximum number of pizzas delivered in a single order?
+Q4. What was the maximum number of pizzas delivered in a single order?
 SELECT MAX(a.CP)AS Max_Pizza_Delivered
 FROM    (SELECT order_id, 
 	COUNT(pizza_id) OVER(PARTITION BY order_id)AS CP 
 	FROM customer_orders)a;
 
-
--- For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+Q5. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 SELECT c.customer_id, 
 SUM(CASE WHEN (exclusions IS NOT NULL AND exclusions != 0) 
     OR (extras IS NOT NULL AND extras != 0) THEN 1
@@ -47,7 +45,7 @@ ON c.order_id = r.order_id
 WHERE r.distance != 0
 GROUP BY c.customer_id;
 
--- How many pizzas were delivered that had both exclusions and extras?
+Q6. How many pizzas were delivered that had both exclusions and extras?
 SELECT c.customer_id,
 SUM(CASE WHEN (c.exclusions IS NOT NULL AND c.exclusions !=0) 
 AND (c.extras IS NOT NULL AND c.extras !=0) THEN 1 ELSE 0 END)AS Both_exclusion_extra
@@ -58,27 +56,27 @@ WHERE r.distance != 0
 GROUP BY c.customer_id
 ORDER BY Both_exclusion_extra DESC;
 
--- What was the total volume of pizzas ordered for each hour of the day?
+Q7. What was the total volume of pizzas ordered for each hour of the day?
 SELECT HOUR(order_time)as hour_time,
 COUNT(order_id)AS Pizzas_Ordered
 FROM customer_orders
 GROUP BY hour_time
 ORDER BY hour_time;
 
--- What was the volume of orders for each day of the week?
+Q8. What was the volume of orders for each day of the week?
 SELECT dayname(order_time)as day, COUNT(order_id)as Pizzas_ordered
 FROM customer_orders
 GROUP BY day
 ORDER BY Pizzas_ordered DESC;
 
 
--- B. Runner and Customer Experience
--- How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
+ B. Runner and Customer Experience
+Q1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
 SELECT WEEK(registration_date) AS RegistrationWeek, COUNT(runner_id) AS RunnerRegistrated
 FROM runners
 GROUP BY RegistrationWeek;
 
--- What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
+Q2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?
 SELECT r.runner_id, ROUND(AVG(timestampdiff(MINUTE, c.order_time, r.pickup_time)),2)AS Pickup_Duration
 FROM runner_orders r JOIN customer_orders c ON c.order_id = r.order_id
 GROUP BY r.runner_id;
@@ -90,7 +88,7 @@ select A.runner_id, (avg(datediff(minute,B.order_time, A.pickup_time))) as minut
  where cancellation=' '
  group by runner_id;
 
--- Is there any relationship between the number of pizzas and how long the order takes to prepare?
+Q3. Is there any relationship between the number of pizzas and how long the order takes to prepare?
 WITH Pizza_Count AS
 (SELECT c.order_id, COUNT(c.order_id) AS PizzaCount, 
 ROUND((TIMESTAMPDIFF(MINUTE, c.order_time, r.pickup_time))) AS Avgtime
@@ -103,7 +101,7 @@ SELECT PizzaCount, Avgtime
 FROM Pizza_Count
 GROUP BY PizzaCount;
 
--- What was the average distance travelled for each customer?
+Q4. What was the average distance travelled for each customer?
 WITH Avg_Distance AS (
 SELECT c.customer_id, ROUND(AVG(r.distance),1)AS AvgDistance
 FROM customer_orders c JOIN runner_orders r
@@ -120,7 +118,7 @@ ON c.order_id = r.runner_id
 WHERE r.distance <> 0
 GROUP BY c.customer_id)a;
 
--- What was the difference between the longest and shortest delivery times for all orders?
+Q5. What was the difference between the longest and shortest delivery times for all orders?
 WITH TIME_DIFF AS
 ( SELECT c.order_id, c.order_time, r.pickup_time, 
 TIMESTAMPDIFF(MINUTE, c.order_time, r.pickup_time) AS TimeDiff
@@ -132,7 +130,7 @@ GROUP BY c.order_id, c.order_time, r.pickup_time)
 
 SELECT MAX(TimeDiff) - MIN(TimeDiff) AS DifferenceTime FROM TIME_DIFF;
 
--- What was the average speed for each runner for each delivery and do you notice any trend for these values?
+Q6. What was the average speed for each runner for each delivery and do you notice any trend for these values?
 WITH AVG_SPEED AS 
 ( SELECT runner_id, order_id, 
 ROUND(distance *60/duration,1) AS speed_in_KMPH
@@ -140,7 +138,7 @@ FROM runner_orders
 WHERE distance != 0
 GROUP BY runner_id, order_id)
 
--- What is the successful delivery percentage for each runner?
+Q7. What is the successful delivery percentage for each runner?
 WITH SUCCESS AS
 ( select runner_id, SUM(CASE WHEN distance != 0 THEN 1 else 0 end) as SUCCESS_ORDERS, 
 COUNT(order_id) AS TotalOrders
@@ -152,7 +150,7 @@ FROM SUCCESS
 ORDER BY runner_id;
 
 -- C. Ingredient Optimisation
--- What are the standard ingredients for each pizza?
+Q1. What are the standard ingredients for each pizza?
 -- Normalize Pizza Recipe table
 drop table if exists pizza_recipes1;
 create table pizzarunner.pizza_recipes1 
@@ -189,7 +187,7 @@ select pizza_name, group_concat(topping_name) as StandardToppings
 from cte
 group by pizza_name;
 
--- What was the most commonly added extra?
+Q2. What was the most commonly added extra?
 drop table if exists numbers;
 CREATE TABLE numbers (
   num INT PRIMARY KEY
@@ -213,7 +211,7 @@ where one_tag != 0
 group by one_tag;
 
 
--- What was the most common exclusion?
+Q3. What was the most common exclusion?
 drop table if exists numbers;
 CREATE TABLE numbers (
   num INT PRIMARY KEY
@@ -240,7 +238,7 @@ order by Occurrencecount desc;
 
 
 
--- Generate an order item for each record in the customers_orders table in the format of one of the following:
+Q4. Generate an order item for each record in the customers_orders table in the format of one of the following:
 -- Meat Lovers
 -- Meat Lovers - Exclude Beef
 -- Meat Lovers - Extra Bacon
@@ -266,7 +264,7 @@ on pizza_names.pizza_id = customer_orders1.pizza_id;
 
 
 -- D. Pricing and Ratings
--- If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes 
+Q1. If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes 
 how much money has Pizza Runner made so far if there are no delivery fees?
    select sum(case 
 when c.pizza_id = 1 then 12
@@ -277,7 +275,7 @@ inner join customer_orders1 as c
 on c.order_id = r.order_id
 where r.distance is not null;
 
--- What if there was an additional $1 charge for any pizza extras?
+Q2. What if there was an additional $1 charge for any pizza extras?
 -- Add cheese is $1 extra
 set @basecost = 138;
 select (LENGTH(group_concat(extras)) - LENGTH(REPLACE(group_concat(extras), ',', '')) + 1) + @basecost as Total
@@ -286,7 +284,7 @@ inner join runner_orders1
 on customer_orders1.order_id = runner_orders1.order_id
 where extras is not null and extras !=0 and distance is not null;
 
-/*The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, 
+Q3. The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, 
 how would you design an additional table for this new dataset - 
 generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.
 Using your newly generated table - 
@@ -300,12 +298,14 @@ pickup_time
 Time between order and pickup
 Delivery duration
 Average speed
-Total number of pizzas*/
+Total number of pizzas 
+
 set @pizzaamountearned = 138;
 select @pizzaamountearned - (sum(distance))*0.3 as Finalamount
 from runner_orders1;
 
-/*If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?
+Q4. If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?
+
 set @pizzaamountearned = 138;
 select @pizzaamountearned - (sum(distance))*0.3 as Finalamount
 from runner_orders1;
