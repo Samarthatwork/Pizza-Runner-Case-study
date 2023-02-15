@@ -223,4 +223,4 @@ Total number of pizzas
 6. The average time it takes for each runner to arrive at the Pizza Runner HQ to pickup the order is 36 minutes.
 7. The longest delivery time was 2 hours and 25 minutes, and the shortest delivery time was 4 minutes.
 8. There was no correlation between the number of pizzas in an order and how long it takes to prepare them.
-9. Most of the customers live within 5-6 km of the HQ., **.
+9. Most of the customers live within 5-6 km of the HQ.
