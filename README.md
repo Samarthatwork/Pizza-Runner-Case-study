@@ -1,4 +1,4 @@
-# :ramen: Case Study #2 - Pizza Runner
+# :pizza: Case Study #2 - Pizza Runner
 ![This is an image](https://8weeksqlchallenge.com/images/case-study-designs/2.png)
 ## INTRODUCTION
 > Did you know that over 115 million kilograms of pizza is consumed daily worldwide??? (Well according to Wikipedia anyway…)
