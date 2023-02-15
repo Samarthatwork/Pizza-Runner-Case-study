@@ -46,9 +46,6 @@ The `runners` table contains the following data:
 | 3         | 2021-01-08       |
 | 4         | 2021-01-15       |
 
-## Usage
-
-The `runners` table can be used as a simple reference for tracking the registration dates of new runners.
 
  ### **2. customer_orders**
 
